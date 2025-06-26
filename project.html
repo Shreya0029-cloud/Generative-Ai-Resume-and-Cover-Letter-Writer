@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume & Cover Letter Writer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background elements */
+        .bg-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .shape:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            background: rgba(147, 51, 234, 0.1);
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            background: rgba(16, 185, 129, 0.1);
+            top: 60%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+
+        .shape:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: slideDown 1s ease-out;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            animation: slideUp 1s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .form-section, .preview-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-section:hover, .preview-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+        }
+
+        .form-section h2, .preview-section h2 {
+            color: #6366f1;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #374151;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover:before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            margin-left: 10px;
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .preview-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid #e5e7eb;
+            min-height: 400px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .resume-preview h3 {
+            color: #6366f1;
+            border-bottom: 2px solid #6366f1;
+            padding-bottom: 10px;
+            margin: 20px 0 15px 0;
+        }
+
+        .resume-preview .header-info {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .resume-preview .header-info h2 {
+            color: #1f2937;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .resume-preview .contact-info {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        .work-experience-item, .education-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: rgba(99, 102, 241, 0.05);
+            border-radius: 10px;
+            border-left: 4px solid #6366f1;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 20px;
+            background: transparent;
+            color: #6366f1;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .tab-btn.active {
+            background: #6366f1;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .ai-suggestion {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #065f46;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🚀 AI Resume & Cover Letter Writer</h1>
+            <p>Create professional resumes and cover letters with AI assistance</p>
+        </div>
+
+        <div class="main-content">
+            <div class="form-section">
+                <h2>📝 Your Information</h2>
+                
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" placeholder="Enter your full name">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="your.email@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="tel" id="phone" placeholder="+1 (555) 123-4567">
+                </div>
+
+                <div class="form-group">
+                    <label for="location">Location</label>
+                    <input type="text" id="location" placeholder="City, State">
+                </div>
+
+                <div class="form-group">
+                    <label for="jobTitle">Target Job Title</label>
+                    <input type="text" id="jobTitle" placeholder="e.g., Software Developer">
+                </div>
+
+                <div class="form-group">
+                    <label for="summary">Professional Summary</label>
+                    <textarea id="summary" placeholder="Brief professional summary..."></textarea>
+                    <button class="btn" onclick="generateSummary()" style="margin-top: 10px; font-size: 14px; padding: 8px 16px;">
+                        ✨ AI Generate
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <label for="skills">Skills (comma-separated)</label>
+                    <textarea id="skills" placeholder="JavaScript, Python, React, Node.js..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="experience">Work Experience</label>
+                    <textarea id="experience" placeholder="Job Title | Company | Date Range | Description"></textarea>
+                    <button class="btn" onclick="enhanceExperience()" style="margin-top: 10px; font-size: 14px; padding: 8px 16px;">
+                        🚀 AI Enhance
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <label for="education">Education</label>
+                    <textarea id="education" placeholder="Degree | Institution | Year | GPA (optional)"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="companyName">Target Company (for Cover Letter)</label>
+                    <input type="text" id="companyName" placeholder="Company Name">
+                </div>
+
+                <button class="btn" onclick="generateResume()">
+                    📄 Generate Resume
+                </button>
+                <button class="btn btn-secondary" onclick="generateCoverLetter()">
+                    📝 Generate Cover Letter
+                </button>
+            </div>
+
+            <div class="preview-section">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('resume')">Resume</button>
+                    <button class="tab-btn" onclick="switchTab('cover-letter')">Cover Letter</button>
+                </div>
+
+                <div id="resume-tab" class="tab-content active">
+                    <h2>📄 Resume Preview</h2>
+                    <div class="preview-content" id="resumePreview">
+                        <div style="text-align: center; color: #6b7280; margin-top: 150px;">
+                            Fill out the form to generate your professional resume
+                        </div>
+                    </div>
+                </div>
+
+                <div id="cover-letter-tab" class="tab-content">
+                    <h2>📝 Cover Letter Preview</h2>
+                    <div class="preview-content" id="coverLetterPreview">
+                        <div style="text-align: center; color: #6b7280; margin-top: 150px;">
+                            Fill out the form and generate your personalized cover letter
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; text-align: center;">
+                    <button class="btn" onclick="downloadPDF()">
+                        💾 Download PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTab = 'resume';
+        let generatedContent = {
+            resume: '',
+            coverLetter: ''
+        };
+
+        function switchTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tab + '-tab').classList.add('active');
+            
+            currentTab = tab;
+        }
+
+        function generateSummary() {
+            const jobTitle = document.getElementById('jobTitle').value;
+            const skills = document.getElementById('skills').value;
+            
+            if (!jobTitle) {
+                alert('Please enter a target job title first');
+                return;
+            }
+
+            const button = event.target;
+            const originalText = button.innerHTML;
+            button.innerHTML = '<span class="loading"></span> Generating...';
+            button.disabled = true;
+
+            // Simulate AI generation
+            setTimeout(() => {
+                const summaries = [
+                    `Dynamic ${jobTitle} with proven expertise in ${skills.split(',')[0] || 'technology'}. Passionate about delivering innovative solutions and driving team success through collaborative problem-solving and continuous learning.`,
+                    `Results-driven ${jobTitle} with strong background in ${skills.split(',')[0] || 'software development'}. Committed to excellence in code quality, user experience, and project delivery while staying current with industry best practices.`,
+                    `Experienced ${jobTitle} specializing in ${skills.split(',')[0] || 'technical solutions'}. Known for analytical thinking, attention to detail, and ability to translate complex requirements into efficient, scalable implementations.`
+                ];
+                
+                const randomSummary = summaries[Math.floor(Math.random() * summaries.length)];
+                document.getElementById('summary').value = randomSummary;
+                
+                // Show AI suggestion
+                showAISuggestion('Professional summary generated! Feel free to customize it further.');
+                
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }, 2000);
+        }
+
+        function enhanceExperience() {
+            const experience = document.getElementById('experience').value;
+            
+            if (!experience) {
+                alert('Please enter your work experience first');
+                return;
+            }
+
+            const button = event.target;
+            const originalText = button.innerHTML;
+            button.innerHTML = '<span class="loading"></span> Enhancing...';
+            button.disabled = true;
+
+            setTimeout(() => {
+                const enhancedExperience = experience + '\n\n• Achieved 20% improvement in team productivity through process optimization\n• Collaborated with cross-functional teams to deliver projects on time\n• Mentored junior team members and contributed to knowledge sharing initiatives';
+                
+                document.getElementById('experience').value = enhancedExperience;
+                showAISuggestion('Experience enhanced with quantifiable achievements and action verbs!');
+                
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }, 2000);
+        }
+
+        function generateResume() {
+            const data = collectFormData();
+            
+            if (!data.fullName || !data.email) {
+                alert('Please fill in at least your name and email');
+                return;
+            }
+
+            const resumeHTML = createResumeHTML(data);
+            document.getElementById('resumePreview').innerHTML = resumeHTML;
+            generatedContent.resume = resumeHTML;
+            
+            showAISuggestion('Resume generated successfully! Review and download when ready.');
+        }
+
+        function generateCoverLetter() {
+            const data = collectFormData();
+            
+            if (!data.fullName || !data.companyName || !data.jobTitle) {
+                alert('Please fill in your name, target company, and job title');
+                return;
+            }
+
+            const coverLetterHTML = createCoverLetterHTML(data);
+            document.getElementById('coverLetterPreview').innerHTML = coverLetterHTML;
+            generatedContent.coverLetter = coverLetterHTML;
+            
+            // Switch to cover letter tab
+            switchTab('cover-letter');
+            document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            document.querySelectorAll('.tab-btn')[0].classList.remove('active');
+            
+            showAISuggestion('Cover letter generated! Personalized for ' + data.companyName);
+        }
+
+        function collectFormData() {
+            return {
+                fullName: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                location: document.getElementById('location').value,
+                jobTitle: document.getElementById('jobTitle').value,
+                summary: document.getElementById('summary').value,
+                skills: document.getElementById('skills').value,
+                experience: document.getElementById('experience').value,
+                education: document.getElementById('education').value,
+                companyName: document.getElementById('companyName').value
+            };
+        }
+
+        function createResumeHTML(data) {
+            return `
+                <div class="resume-preview">
+                    <div class="header-info">
+                        <h2>${data.fullName}</h2>
+                        <div class="contact-info">
+                            ${data.email} | ${data.phone} | ${data.location}
+                        </div>
+                    </div>
+                    
+                    ${data.summary ? `
+                        <h3>Professional Summary</h3>
+                        <p>${data.summary}</p>
+                    ` : ''}
+                    
+                    ${data.skills ? `
+                        <h3>Technical Skills</h3>
+                        <p>${data.skills}</p>
+                    ` : ''}
+                    
+                    ${data.experience ? `
+                        <h3>Work Experience</h3>
+                        <div class="work-experience-item">
+                            ${data.experience.replace(/\n/g, '<br>')}
+                        </div>
+                    ` : ''}
+                    
+                    ${data.education ? `
+                        <h3>Education</h3>
+                        <div class="education-item">
+                            ${data.education.replace(/\n/g, '<br>')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function createCoverLetterHTML(data) {
+            const currentDate = new Date().toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+
+            return `
+                <div style="line-height: 1.6; color: #374151;">
+                    <div style="margin-bottom: 30px;">
+                        <strong>${data.fullName}</strong><br>
+                        ${data.email}<br>
+                        ${data.phone}<br>
+                        ${data.location}
+                    </div>
+                    
+                    <div style="margin-bottom: 30px;">
+                        ${currentDate}
+                    </div>
+                    
+                    <div style="margin-bottom: 30px;">
+                        Dear Hiring Manager,<br>
+                        ${data.companyName}
+                    </div>
+                    
+                    <p style="margin-bottom: 20px;">
+                        I am writing to express my strong interest in the ${data.jobTitle} position at ${data.companyName}. With my background in ${data.skills.split(',')[0] || 'technology'} and passion for innovation, I am excited about the opportunity to contribute to your team's success.
+                    </p>
+                    
+                    <p style="margin-bottom: 20px;">
+                        ${data.summary || 'My professional experience has equipped me with the skills and knowledge necessary to excel in this role. I am particularly drawn to ' + data.companyName + '\'s commitment to excellence and would welcome the opportunity to contribute to your continued success.'}
+                    </p>
+                    
+                    <p style="margin-bottom: 20px;">
+                        I would welcome the opportunity to discuss how my skills and enthusiasm can benefit ${data.companyName}. Thank you for your time and consideration. I look forward to hearing from you soon.
+                    </p>
+                    
+                    <p>
+                        Sincerely,<br>
+                        ${data.fullName}
+                    </p>
+                </div>
+            `;
+        }
+
+        function showAISuggestion(message) {
+            const suggestion = document.createElement('div');
+            suggestion.className = 'ai-suggestion';
+            suggestion.innerHTML = `🤖 ${message}`;
+            
+            document.querySelector('.form-section').appendChild(suggestion);
+            
+            setTimeout(() => {
+                suggestion.style.opacity = '0';
+                setTimeout(() => suggestion.remove(), 300);
+            }, 3000);
+        }
+
+        function downloadPDF() {
+            const content = currentTab === 'resume' ? generatedContent.resume : generatedContent.coverLetter;
+            
+            if (!content) {
+                alert('Please generate content first');
+                return;
+            }
+            
+            // Create a new window with the content
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>${currentTab === 'resume' ? 'Resume' : 'Cover Letter'}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 40px; line-height: 1.6; }
+                        h2, h3 { color: #6366f1; }
+                        .header-info { text-align: center; margin-bottom: 30px; }
+                        .work-experience-item, .education-item { margin-bottom: 15px; }
+                    </style>
+                </head>
+                <body>${content}</body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        // Add some interactive animations on load
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.form-group').forEach((group, index) => {
+                group.style.opacity = '0';
+                group.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    group.style.transition = 'all 0.5s ease';
+                    group.style.opacity = '1';
+                    group.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
